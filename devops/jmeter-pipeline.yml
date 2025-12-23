@@ -1,0 +1,21 @@
+# ❌ Desactivar triggers por cambios
+trigger: none
+pr: none
+
+# ⏱️ Ejecutar cada 2 días
+schedules:
+  - cron: "0 0 */2 * *"
+    displayName: "Run JMeter performance tests every 2 days"
+    branches:
+      include:
+        - master
+    always: true
+
+pool:
+  name: develop-agent   # self-hosted agent donde corre Docker/JMeter
+
+steps:
+  - script: |
+      chmod +x test.sh
+      ./test.sh
+    displayName: "Run JMeter performance tests"
