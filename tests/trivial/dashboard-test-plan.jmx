@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.5" jmeter="5.5">
+  <hashTree>
+
+    <!-- ================================================= -->
+    <!--              DASHBOARD TEST FRAGMENT              -->
+    <!-- ================================================= -->
+    <TestFragmentController guiclass="TestFragmentControllerGui"
+                            testclass="TestFragmentController"
+                            testname="DASHBOARD FRAGMENT"
+                            enabled="true"/>
+    <hashTree>
+
+      <!-- ================================================= -->
+      <!--          TRANSACTION: LOAD DASHBOARD              -->
+      <!-- ================================================= -->
+      <TransactionController guiclass="TransactionControllerGui"
+                             testclass="TransactionController"
+                             testname="LOAD DASHBOARD"
+                             enabled="true">
+        <boolProp name="TransactionController.parent">true</boolProp>
+        <boolProp name="TransactionController.includeTimers">false</boolProp>
+      </TransactionController>
+
+      <hashTree>
+
+        <!-- ================= GET DASHBOARD ================= -->
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui"
+                          testclass="HTTPSamplerProxy"
+                          testname="GET Dashboard"
+                          enabled="true">
+          <stringProp name="HTTPSampler.protocol">${__P(TARGET_PROTOCOL,https)}</stringProp>
+          <stringProp name="HTTPSampler.domain">${__P(TARGET_HOST)}</stringProp>
+          <stringProp name="HTTPSampler.port">${__P(TARGET_PORT,443)}</stringProp>
+          <stringProp name="HTTPSampler.path">${__P(TARGET_PATH)}?module=Home&amp;view=DashBoard</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+
+        <!-- ============ POST WIDGET MetricsByModule ========= -->
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui"
+                          testclass="HTTPSamplerProxy"
+                          testname="Widget MetricsByModule"
+                          enabled="true">
+          <stringProp name="HTTPSampler.protocol">${__P(TARGET_PROTOCOL,https)}</stringProp>
+          <stringProp name="HTTPSampler.domain">${__P(TARGET_HOST)}</stringProp>
+          <stringProp name="HTTPSampler.port">${__P(TARGET_PORT,443)}</stringProp>
+          <stringProp name="HTTPSampler.path">${__P(TARGET_PATH)}</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+
+          <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+
+              <elementProp name="module" elementType="HTTPArgument">
+                <stringProp name="Argument.name">module</stringProp>
+                <stringProp name="Argument.value">Home</stringProp>
+              </elementProp>
+
+              <elementProp name="action" elementType="HTTPArgument">
+                <stringProp name="Argument.name">action</stringProp>
+                <stringProp name="Argument.value">ShowWidget</stringProp>
+              </elementProp>
+
+              <elementProp name="name" elementType="HTTPArgument">
+                <stringProp name="Argument.name">name</stringProp>
+                <stringProp name="Argument.value">MetricsByModule</stringProp>
+              </elementProp>
+
+              <elementProp name="mode" elementType="HTTPArgument">
+                <stringProp name="Argument.name">mode</stringProp>
+                <stringProp name="Argument.value">graphic</stringProp>
+              </elementProp>
+
+              <elementProp name="__vtrftk" elementType="HTTPArgument">
+                <stringProp name="Argument.name">__vtrftk</stringProp>
+                <stringProp name="Argument.value">${csrfToken}</stringProp>
+              </elementProp>
+
+            </collectionProp>
+          </elementProp>
+
+        </HTTPSamplerProxy>
+        <hashTree/>
+
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.5">
+  <hashTree>
+
+    <!-- TEST PLAN -->
+    <TestPlan guiclass="TestPlanGui"
+              testclass="TestPlan"
+              testname="Login Fragment Plan"
+              enabled="true">
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+    </TestPlan>
+
+    <hashTree>
+
+      <!-- TEST FRAGMENT (Incluido desde IncludeController) -->
+      <TestFragmentController guiclass="TestFragmentControllerGui"
+                              testclass="TestFragmentController"
+                              testname="Login Fragment"
+                              enabled="true"/>
+      <hashTree>
+
+        <!-- COOKIE MANAGER (obligatorio para DataCRM) -->
+        <CookieManager guiclass="CookiePanel"
+                       testclass="CookieManager"
+                       testname="HTTP Cookie Manager"
+                       enabled="true">
+          <collectionProp name="CookieManager.cookies"/>
+        </CookieManager>
+        <hashTree/>
+
+        <!-- HEADER MANAGER (simula navegador real) -->
+        <HeaderManager guiclass="HeaderPanel"
+                       testclass="HeaderManager"
+                       testname="HTTP Header Manager"
+                       enabled="true">
+          <collectionProp name="HeaderManager.headers">
+
+            <elementProp name="User-Agent" elementType="Header">
+              <stringProp name="Header.name">User-Agent</stringProp>
+              <stringProp name="Header.value">Mozilla/5.0 (Windows NT 10.0; Win64; x64)</stringProp>
+            </elementProp>
+
+            <elementProp name="Content-Type" elementType="Header">
+              <stringProp name="Header.name">Content-Type</stringProp>
+              <stringProp name="Header.value">application/x-www-form-urlencoded</stringProp>
+            </elementProp>
+
+            <elementProp name="Accept" elementType="Header">
+              <stringProp name="Header.name">Accept</stringProp>
+              <stringProp name="Header.value">text/html,application/xhtml+xml</stringProp>
+            </elementProp>
+
+          </collectionProp>
+        </HeaderManager>
+        <hashTree/>
+
+        <!-- GET LOGIN PAGE (para obtener token y cookies iniciales) -->
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui"
+                          testclass="HTTPSamplerProxy"
+                          testname="GET Login Page"
+                          enabled="true">
+          <stringProp name="HTTPSampler.protocol">${__P(TARGET_PROTOCOL,https)}</stringProp>
+          <stringProp name="HTTPSampler.domain">${__P(TARGET_HOST)}</stringProp>
+          <stringProp name="HTTPSampler.port">${__P(TARGET_PORT,443)}</stringProp>
+          <stringProp name="HTTPSampler.path">${__P(TARGET_PATH)}</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+
+          <!-- GET sí puede redirigir -->
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+        </HTTPSamplerProxy>
+
+        <hashTree>
+
+          <!-- Regex Extractor: CSRF TOKEN "__vtrftk" -->
+          <RegexExtractor guiclass="RegexExtractorGui"
+                          testclass="RegexExtractor"
+                          testname="Extract CSRF Token"
+                          enabled="true">
+            <stringProp name="RegexExtractor.refname">csrfToken</stringProp>
+            <stringProp name="RegexExtractor.regex">name="__vtrftk" value="(.+?)"</stringProp>
+            <stringProp name="RegexExtractor.template">$1$</stringProp>
+            <stringProp name="RegexExtractor.default">NOT_FOUND</stringProp>
+          </RegexExtractor>
+
+        </hashTree>
+
+        <!-- POST LOGIN (NO redirecciones automáticas) -->
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui"
+                          testclass="HTTPSamplerProxy"
+                          testname="POST Login"
+                          enabled="true">
+          <stringProp name="HTTPSampler.protocol">${__P(TARGET_PROTOCOL,https)}</stringProp>
+          <stringProp name="HTTPSampler.domain">${__P(TARGET_HOST)}</stringProp>
+          <stringProp name="HTTPSampler.port">${__P(TARGET_PORT,443)}</stringProp>
+          <stringProp name="HTTPSampler.path">/datacrm/cpuniminuto/index.php?module=Users&amp;action=Login</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+
+          <!-- 🔥 CRÍTICO: NO SE PERMITE redirigir POST -->
+          <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+
+          <!-- Campos EXACTOS del formulario -->
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+
+              <elementProp name="__vtrftk" elementType="HTTPArgument">
+                <stringProp name="Argument.name">__vtrftk</stringProp>
+                <stringProp name="Argument.value">${csrfToken}</stringProp>
+              </elementProp>
+
+              <elementProp name="module" elementType="HTTPArgument">
+                <stringProp name="Argument.name">module</stringProp>
+                <stringProp name="Argument.value">Users</stringProp>
+              </elementProp>
+
+              <elementProp name="action" elementType="HTTPArgument">
+                <stringProp name="Argument.name">action</stringProp>
+                <stringProp name="Argument.value">Login</stringProp>
+              </elementProp>
+
+              <elementProp name="username" elementType="HTTPArgument">
+                <stringProp name="Argument.name">username</stringProp>
+                <stringProp name="Argument.value">${JM_USERNAME}</stringProp>
+              </elementProp>
+
+              <elementProp name="password" elementType="HTTPArgument">
+                <stringProp name="Argument.name">password</stringProp>
+                <stringProp name="Argument.value">${JM_PASSWORD}</stringProp>
+              </elementProp>
+
+            </collectionProp>
+          </elementProp>
+
+        </HTTPSamplerProxy>
+
+        <hashTree>
+
+          <!-- ASSERTION: Login sin error=1 -->
+          <ResponseAssertion guiclass="AssertionGui"
+                             testclass="ResponseAssertion"
+                             testname="Login OK Assertion"
+                             enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="0">error=1</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <!-- NOT_CONTAINS -->
+            <intProp name="Assertion.test_type">6</intProp>
+          </ResponseAssertion>
+
+        </hashTree>
+
+        <!-- GET Home (solo después de login) -->
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui"
+                          testclass="HTTPSamplerProxy"
+                          testname="GET Home After Login"
+                          enabled="true">
+          <stringProp name="HTTPSampler.protocol">${__P(TARGET_PROTOCOL,https)}</stringProp>
+          <stringProp name="HTTPSampler.domain">${__P(TARGET_HOST)}</stringProp>
+          <stringProp name="HTTPSampler.port">${__P(TARGET_PORT,443)}</stringProp>
+          <stringProp name="HTTPSampler.path">/datacrm/cpuniminuto/index.php</stringProp>
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+
+          <!-- GET SÍ redirige -->
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+        </HTTPSamplerProxy>
+
+        <hashTree/>
+
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>

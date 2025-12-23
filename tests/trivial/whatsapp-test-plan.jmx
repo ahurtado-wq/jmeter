@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.5" jmeter="5.5">
+  <hashTree>
+
+    <TestFragmentController guiclass="TestFragmentControllerGui"
+                            testclass="TestFragmentController"
+                            testname="WHATSAPP FRAGMENT"
+                            enabled="true"/>
+    <hashTree>
+
+      <TransactionController guiclass="TransactionControllerGui"
+                             testclass="TransactionController"
+                             testname="LOAD WHATSAPP"
+                             enabled="true">
+        <boolProp name="TransactionController.parent">true</boolProp>
+      </TransactionController>
+
+      <hashTree>
+
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui"
+                          testclass="HTTPSamplerProxy"
+                          testname="GET WhatsApp View"
+                          enabled="true">
+
+          <stringProp name="HTTPSampler.protocol">${__P(TARGET_PROTOCOL,https)}</stringProp>
+          <stringProp name="HTTPSampler.domain">${__P(TARGET_HOST)}</stringProp>
+          <stringProp name="HTTPSampler.port">${__P(TARGET_PORT,443)}</stringProp>
+
+          <stringProp name="HTTPSampler.path">${__P(TARGET_PATH)}?module=Chats&amp;view=WhatsApp</stringProp>
+
+          <stringProp name="HTTPSampler.method">GET</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+
+        </HTTPSamplerProxy>
+        <hashTree/>
+
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>

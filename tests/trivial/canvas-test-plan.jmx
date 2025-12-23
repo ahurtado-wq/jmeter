@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.5">
+  <hashTree>
+
+    <!-- TEST PLAN -->
+    <TestPlan guiclass="TestPlanGui"
+              testclass="TestPlan"
+              testname="Canvas Fragment Plan"
+              enabled="true">
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+    </TestPlan>
+
+    <hashTree>
+
+      <!-- TEST FRAGMENT -->
+      <TestFragmentController guiclass="TestFragmentControllerGui"
+                              testclass="TestFragmentController"
+                              testname="Canvas Fragment"
+                              enabled="true"/>
+      <hashTree>
+
+        <!-- HEADERS -->
+        <HeaderManager guiclass="HeaderPanel"
+                       testclass="HeaderManager"
+                       testname="Canvas Headers"
+                       enabled="true">
+          <collectionProp name="HeaderManager.headers">
+            <elementProp name="User-Agent" elementType="Header">
+              <stringProp name="Header.name">User-Agent</stringProp>
+              <stringProp name="Header.value">Mozilla/5.0</stringProp>
+            </elementProp>
+
+            <elementProp name="Content-Type" elementType="Header">
+              <stringProp name="Header.name">Content-Type</stringProp>
+              <stringProp name="Header.value">application/x-www-form-urlencoded</stringProp>
+            </elementProp>
+          </collectionProp>
+        </HeaderManager>
+        <hashTree/>
+
+        <!-- ========================================================= -->
+        <!--  TRANSACTION CONTROLLER: LOAD CANVAS                      -->
+        <!-- ========================================================= -->
+        <TransactionController guiclass="TransactionControllerGui"
+                               testclass="TransactionController"
+                               testname="LOAD CANVAS"
+                               enabled="true">
+          <boolProp name="TransactionController.parent">true</boolProp>
+          <boolProp name="TransactionController.includeTimers">false</boolProp>
+        </TransactionController>
+
+        <hashTree>
+
+          <!-- 1) GET index.php (carga vista inicial) -->
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui"
+                            testclass="HTTPSamplerProxy"
+                            testname="GET Canvas View"
+                            enabled="true">
+            <stringProp name="HTTPSampler.protocol">${__P(TARGET_PROTOCOL,https)}</stringProp>
+            <stringProp name="HTTPSampler.domain">${__P(TARGET_HOST)}</stringProp>
+            <stringProp name="HTTPSampler.port">${__P(TARGET_PORT,443)}</stringProp>
+            <stringProp name="HTTPSampler.path">${__P(TARGET_PATH)}</stringProp>
+            <stringProp name="HTTPSampler.method">GET</stringProp>
+          </HTTPSamplerProxy>
+          <hashTree/>
+
+          <!-- 2) POST GetInfo (carga datos del canvas) -->
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui"
+                            testclass="HTTPSamplerProxy"
+                            testname="POST Canvas GetInfo"
+                            enabled="true">
+
+            <stringProp name="HTTPSampler.protocol">${__P(TARGET_PROTOCOL,https)}</stringProp>
+            <stringProp name="HTTPSampler.domain">${__P(TARGET_HOST)}</stringProp>
+            <stringProp name="HTTPSampler.port">${__P(TARGET_PORT,443)}</stringProp>
+            <stringProp name="HTTPSampler.path">${__P(TARGET_PATH)}</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+
+                <elementProp name="__vtrftk" elementType="HTTPArgument">
+                  <stringProp name="Argument.name">__vtrftk</stringProp>
+                  <stringProp name="Argument.value">${csrfToken}</stringProp>
+                </elementProp>
+
+                <elementProp name="module" elementType="HTTPArgument">
+                  <stringProp name="Argument.name">module</stringProp>
+                  <stringProp name="Argument.value">Shortcut</stringProp>
+                </elementProp>
+
+                <elementProp name="action" elementType="HTTPArgument">
+                  <stringProp name="Argument.name">action</stringProp>
+                  <stringProp name="Argument.value">GetInfo</stringProp>
+                </elementProp>
+
+                <elementProp name="mode" elementType="HTTPArgument">
+                  <stringProp name="Argument.name">mode</stringProp>
+                  <stringProp name="Argument.value">getData</stringProp>
+                </elementProp>
+
+              </collectionProp>
+            </elementProp>
+
+          </HTTPSamplerProxy>
+          <hashTree/>
+
+        </hashTree>
+
+        <!-- ========================================================= -->
+        <!--  POST SAVE (TU REQUEST ORIGINAL, SIN TOCAR NADA)         -->
+        <!-- ========================================================= -->
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui"
+                          testclass="HTTPSamplerProxy"
+                          testname="POST Save Canvas"
+                          enabled="true">
+
+          <stringProp name="HTTPSampler.protocol">${__P(TARGET_PROTOCOL,https)}</stringProp>
+          <stringProp name="HTTPSampler.domain">${__P(TARGET_HOST)}</stringProp>
+          <stringProp name="HTTPSampler.port">${__P(TARGET_PORT,443)}</stringProp>
+          <stringProp name="HTTPSampler.path">${__P(TARGET_PATH)}</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+
+          <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+
+              <!-- TOKEN Y CONTROL -->
+              <elementProp name="__vtrftk" elementType="HTTPArgument">
+                <stringProp name="Argument.name">__vtrftk</stringProp>
+                <stringProp name="Argument.value">${csrfToken}</stringProp>
+              </elementProp>
+
+              <elementProp name="module" elementType="HTTPArgument">
+                <stringProp name="Argument.name">module</stringProp>
+                <stringProp name="Argument.value">Shortcut</stringProp>
+              </elementProp>
+
+              <elementProp name="action" elementType="HTTPArgument">
+                <stringProp name="Argument.name">action</stringProp>
+                <stringProp name="Argument.value">Save</stringProp>
+              </elementProp>
+
+              <elementProp name="mode" elementType="HTTPArgument">
+                <stringProp name="Argument.name">mode</stringProp>
+                <stringProp name="Argument.value">saveByModule</stringProp>
+              </elementProp>
+
+              <!-- CONTACTS -->
+              <elementProp name="modules[Contacts][assigned_user_id]" elementType="HTTPArgument">
+                <stringProp name="Argument.name">modules[Contacts][assigned_user_id]</stringProp>
+                <stringProp name="Argument.value">74</stringProp>
+              </elementProp>
+
+              <elementProp name="modules[Contacts][mailingcountry]" elementType="HTTPArgument">
+                <stringProp name="Argument.name">modules[Contacts][mailingcountry]</stringProp>
+                <stringProp name="Argument.value">Colombia</stringProp>
+              </elementProp>
+
+              <elementProp name="modules[Contacts][leadsource]" elementType="HTTPArgument">
+                <stringProp name="Argument.name">modules[Contacts][leadsource]</stringProp>
+                <stringProp name="Argument.value">Other</stringProp>
+              </elementProp>
+
+              <elementProp name="modules[Contacts][chatbot]" elementType="HTTPArgument">
+                <stringProp name="Argument.name">modules[Contacts][chatbot]</stringProp>
+                <stringProp name="Argument.value">0</stringProp>
+              </elementProp>
+
+              <elementProp name="modules[Contacts][cf_1212]" elementType="HTTPArgument">
+                <stringProp name="Argument.name">modules[Contacts][cf_1212]</stringProp>
+                <stringProp name="Argument.value">0</stringProp>
+              </elementProp>
+
+              <elementProp name="modules[Contacts][cf_1214]" elementType="HTTPArgument">
+                <stringProp name="Argument.name">modules[Contacts][cf_1214]</stringProp>
+                <stringProp name="Argument.value">0</stringProp>
+              </elementProp>
+
+              <elementProp name="modules[Contacts][cf_1216]" elementType="HTTPArgument">
+                <stringProp name="Argument.name">modules[Contacts][cf_1216]</stringProp>
+                <stringProp name="Argument.value">0</stringProp>
+              </elementProp>
+
+              <elementProp name="modules[Contacts][cf_1218]" elementType="HTTPArgument">
+                <stringProp name="Argument.name">modules[Contacts][cf_1218]</stringProp>
+                <stringProp name="Argument.value">0</stringProp>
+              </elementProp>
+
+              <elementProp name="modules[Contacts][cf_1220]" elementType="HTTPArgument">
+                <stringProp name="Argument.name">modules[Contacts][cf_1220]</stringProp>
+                <stringProp name="Argument.value">0</stringProp>
+              </elementProp>
+
+              <elementProp name="modules[Contacts][lastname]" elementType="HTTPArgument">
+                <stringProp name="Argument.name">modules[Contacts][lastname]</stringProp>
+                <stringProp name="Argument.value">maria</stringProp>
+              </elementProp>
+
+              <!-- POTENTIALS -->
+              <elementProp name="modules[Potentials][cf_1208]" elementType="HTTPArgument">
+                <stringProp name="Argument.name">modules[Potentials][cf_1208]</stringProp>
+                <stringProp name="Argument.value">Si</stringProp>
+              </elementProp>
+
+              <elementProp name="modules[Potentials][sales_stage]" elementType="HTTPArgument">
+                <stringProp name="Argument.name">modules[Potentials][sales_stage]</stringProp>
+                <stringProp name="Argument.value">Lead</stringProp>
+              </elementProp>
+
+              <elementProp name="modules[Potentials][closingdate]" elementType="HTTPArgument">
+                <stringProp name="Argument.name">modules[Potentials][closingdate]</stringProp>
+                <stringProp name="Argument.value">2025-12-18</stringProp>
+              </elementProp>
+
+              <elementProp name="modules[Potentials][amount]" elementType="HTTPArgument">
+                <stringProp name="Argument.name">modules[Potentials][amount]</stringProp>
+                <stringProp name="Argument.value">4.57</stringProp>
+              </elementProp>
+
+              <elementProp name="modules[Potentials][assigned_user_id]" elementType="HTTPArgument">
+                <stringProp name="Argument.name">modules[Potentials][assigned_user_id]</stringProp>
+                <stringProp name="Argument.value">74</stringProp>
+              </elementProp>
+
+              <elementProp name="modules[Potentials][leadsource]" elementType="HTTPArgument">
+                <stringProp name="Argument.name">modules[Potentials][leadsource]</stringProp>
+                <stringProp name="Argument.value">Other</stringProp>
+              </elementProp>
+
+              <elementProp name="modules[Potentials][cf_1294]" elementType="HTTPArgument">
+                <stringProp name="Argument.name">modules[Potentials][cf_1294]</stringProp>
+                <stringProp name="Argument.value">Ene.Mar</stringProp>
+              </elementProp>
+
+              <elementProp name="modules[Potentials][product_relatedid]" elementType="HTTPArgument">
+                <stringProp name="Argument.name">modules[Potentials][product_relatedid]</stringProp>
+                <stringProp name="Argument.value">93692</stringProp>
+              </elementProp>
+
+              <elementProp name="modules[Potentials][product_relatedid_display]" elementType="HTTPArgument">
+                <stringProp name="Argument.name">modules[Potentials][product_relatedid_display]</stringProp>
+                <stringProp name="Argument.value">Derecho</stringProp>
+              </elementProp>
+
+            </collectionProp>
+          </elementProp>
+
+        </HTTPSamplerProxy>
+        <hashTree/>
+
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>
